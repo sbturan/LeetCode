@@ -12,7 +12,7 @@ public class AddandSearchWord_DataStructureDesign {
 		w.addWord("bat");
 		System.out.println(w.search(".at"));
 		System.out.println(w.search("an."));
-		System.out.println(w.search("a.d."));
+		System.out.println(w.search("a.d."));//
 		System.out.println(w.search("b."));
 		System.out.println(w.search("a.d"));
 		System.out.println(w.search("."));
