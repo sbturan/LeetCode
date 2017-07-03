@@ -5,7 +5,7 @@ public class SerializeandDeserializeBinaryTree {
 	public static void main(String[] args) {
 		SerializeandDeserializeBinaryTree s=new SerializeandDeserializeBinaryTree();
 		Codec c=s.new Codec();
-		TreeNode deserialize = c.deserialize("[5,2,3,null,null,2,4,3,1]");
+		TreeNode deserialize = c.deserialize("[1,2,null,3,null,4,null,5]");
 		System.out.println(c.serialize(deserialize));
 		
 		
