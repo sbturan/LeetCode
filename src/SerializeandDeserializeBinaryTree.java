@@ -19,12 +19,14 @@ public class SerializeandDeserializeBinaryTree {
           StringBuilder sb=new StringBuilder("[");
           if(root!=null)
           queue.add(root);
+          int lastNotNullIndex=2;
           while(!queue.isEmpty()){
         	  TreeNode cur=queue.poll();
         	  if(cur==null){
         		  sb.append("null,");
         	  }else{
         	   sb.append(cur.val+",");
+        	   lastNotNullIndex=sb.length();
         	   if(queue.isEmpty()&&cur.left==null&&cur.right==null){
         		   continue;
         	   }
@@ -33,11 +35,8 @@ public class SerializeandDeserializeBinaryTree {
         	  }
         	 
           }
-          if(sb.charAt(sb.length()-1)==','){
-        	  sb.replace(sb.length()-1, sb.length(), "");
-          }
-          sb.append("]");
-          return sb.toString();
+         
+          return  sb.substring(0,lastNotNullIndex-1)+"]";
 		}
 
 		// Decodes your encoded data to tree.
@@ -54,10 +53,14 @@ public class SerializeandDeserializeBinaryTree {
 				}
 				TreeNode curNode = new TreeNode(Integer.valueOf(cur));
 				 if(i%2==1){
-					 nodes[(i-1)/2].left=curNode;
+					 int j=(i-1)/2;
+					 while(nodes[j]==null) j++;
+					 nodes[j].left=curNode;
 					 
 				 }else{
-					 nodes[(i-2)/2].right=curNode;
+					 int j=(i-2)/2;
+					 while(nodes[j]==null) j++;
+					 nodes[j].right=curNode;
 				 }
 				nodes[i] = curNode;
 			}
