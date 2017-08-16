@@ -5,7 +5,7 @@ public class KInversePairsArray {
 	}
 
  	public static int kInversePairs(int n, int k) {
-                
+                return 0;
  		
 	}
 
