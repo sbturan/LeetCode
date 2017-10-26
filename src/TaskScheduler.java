@@ -2,8 +2,8 @@ import java.util.Arrays;
 
 public class TaskScheduler {
 	public static void main(String[] args) {
-		char[] tasks = new char[] { 'A', 'A', 'A','B', 'B' };
-		int n = 3;
+		char[] tasks = new char[] { 'A', 'A', 'A', 'B', 'B','B'};
+		int n = 2;
 		System.out.println(new TaskScheduler().leastInterval(tasks, n));
 	}
 
