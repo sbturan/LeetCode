@@ -1,4 +1,3 @@
-
 public class OneThreeTwoPattern {
 	public static void main(String[] args) {
 		OneThreeTwoPattern o = new OneThreeTwoPattern();
@@ -6,30 +5,15 @@ public class OneThreeTwoPattern {
 	}
 
 	public boolean find132pattern(int[] nums) {
-
-		int left = 0, right = nums.length - 1;
-		right = nums.length - 1;
-		while (left < nums.length - 2) {
-
-			while (left < right && nums[left]+1 >= nums[right]) {
-				right--;
-			}
-			if (left < right) {
-				int point = right;
-				while (left < right && nums[right] <= nums[point]) {
-					right--;
-				}
-				if (left < right) {
+		for (int i = 0; i < nums.length - 2; i++) {
+			int max = nums[i + 1];
+			for (int j = i + 1; j < nums.length; j++) {
+				max = Math.max(max, nums[j]);
+				if (nums[i] < nums[j] && nums[j] < max) {
 					return true;
 				}
-				right = point - 1;
-			} else {
-				right = nums.length - 1;
-				left++;
 			}
-
 		}
-
 		return false;
 	}
 }
