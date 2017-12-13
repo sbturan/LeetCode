@@ -26,9 +26,8 @@ public class KeyboardRow {
             boolean result=true;
             int i=1;
             while(i<charArray.length&&result) {
-            	if(map[charArray[i++]-'a']!=row) {
-            		result=false;
-            	}
+            	result&=map[charArray[i++]-'a']==row;
+            	
             }
             if(result) {
             	list.add(s);
