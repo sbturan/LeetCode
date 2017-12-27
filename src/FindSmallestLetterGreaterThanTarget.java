@@ -1,18 +1,18 @@
 
 public class FindSmallestLetterGreaterThanTarget {
+
+	public static void main(String[] args) {
+		FindSmallestLetterGreaterThanTarget  f=new FindSmallestLetterGreaterThanTarget();
+		System.out.println(f.nextGreatestLetter(new char[] {'c','f','j'},'c'));
+	}
 	public char nextGreatestLetter(char[] letters, char target) {
-        
-		int index=findIndex(0,letters.length, letters, target);
-	//	index=(index+1)%letters.length;
-		System.out.println(index);
-		return letters[index];
+	    int lo = 0, hi = letters.length;
+        while (lo < hi) {
+            int mi = lo + (hi - lo) / 2;
+            if (letters[mi] <= target) lo = mi + 1;
+            else hi = mi;
+        }
+        return letters[lo % letters.length];
 	}
-	private int findIndex(int left,int right,char[] letters,char target) {
-		if(left>=right) return right;
-		int mid=(right+left)/2;
-		if(letters[mid]<target) {
-			return findIndex(left, mid-1, letters, target);
-		}
-		return findIndex(mid+1, right, letters, target);
-	}
+
 }
