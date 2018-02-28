@@ -2,25 +2,30 @@
 public class LicenseKeyFormatting {
 	public static void main(String[] args) {
 		LicenseKeyFormatting l=new LicenseKeyFormatting();
-		System.out.println(l.licenseKeyFormatting("2-5g-3-J", 2));
+		System.out.println(l.licenseKeyFormatting("5F3Z-2e-9-w", 4));
 	}
 	public String licenseKeyFormatting(String S, int K) {
 		char[] charArray = S.toCharArray();
-		StringBuilder result = new StringBuilder();
+		char[]  resultArray=new char[charArray.length*2];
+		//StringBuilder result = new StringBuilder();
 		int dashConuter=0;
+		int resultArrayIndex=resultArray.length-1;
 		for (int i = charArray.length - 1; i > -1; i--) {
 			if(charArray[i]=='-')continue;
-              result=Character.toUpperCase(charArray[i])+result;
+			resultArray[resultArrayIndex--]=Character.toUpperCase(charArray[i]);
               dashConuter++;
               if(dashConuter==K) {
-            	  result="-"+result;  
+            	  resultArray[resultArrayIndex--]='-';
             	  dashConuter=0;	  
               }
 		}
-		if(result.charAt(0)=='-') {
-			return result.substring(1,result.length());
+		
+		if(resultArrayIndex+1<resultArray.length&&resultArray[resultArrayIndex+1]=='-') {
+			resultArray[resultArrayIndex+1]=' ';
 		}
-		return result;
+		return new String (resultArray).trim();
 
 	}
 }
+
+
