@@ -55,32 +55,46 @@ public class WordLadderII {
 
 	}
 
-	public List<List<String>> findLadders(String beginWord, String endWord, List<String> wordList) {
-
-		List<List<String>> result = new ArrayList<>();
-		ArrayList<String> current = new ArrayList<>();
-		current.add(beginWord);
-		minCount = Integer.MAX_VALUE;
-		HashSet<String> wordList2 = new HashSet<>(wordList);
-		wordList2.remove(beginWord);
-		if (!wordList2.contains(endWord)) {
-			return result;
-		}
-		
-		helper(current, result, beginWord, endWord,  wordList2);
-		List<List<String>> minResult = new ArrayList<>();
-		for (List<String> list : result) {
-			if (list.size() == minCount) {
-				minResult.add(list);
+	private void fillGraph(Set<String> wordList,HashMap<String,Set<String>> graph) {
+		for(String s:wordList) {
+			char[] charArray = s.toCharArray();
+			for(int i=0;i<charArray.length;i++) {
+				for(char j='a';j<'z';j++) {
+					char temp=charArray[i];
+					charArray[i]=j;
+					String string = new String(charArray);
+					if(j!=temp&&wordList.contains(string)) {
+						Set<String> orDefault = graph.getOrDefault(s, new HashSet<String>());
+						orDefault.add(string);
+						graph.put(s, orDefault);
+					}
+					charArray[i]=temp;
+				}
 			}
 		}
-		return minResult;
+	}
+	public List<List<String>> findLadders(String beginWord, String endWord, List<String> wordList) {
+
+		HashMap<String,Set<String>> graph=new HashMap<>();
+		HashSet<String> wordListSet = new HashSet<>(wordList);
+		wordListSet.add(beginWord);
+		fillGraph(wordListSet, graph);
+		ArrayList<List<String>> result=new ArrayList<>(),resultMin=new ArrayList<>();
+		ArrayList<String> current = new ArrayList<>();
+		current.add(beginWord);
+		helper(current, result, beginWord, endWord, new HashSet<>(), graph);
+		for(List<String> list:result) {
+			if(list.size()==minCount)
+			resultMin.add(list);
+		}
+		
+		return resultMin;
 	}
 
 	int minCount = Integer.MAX_VALUE;
 
 	private void helper(List<String> current, List<List<String>> result, String beginWord, String endWord,
-			Set<String> wordList) {
+			Set<String> visiteds,HashMap<String,Set<String>> graph) {
 		if (beginWord.equals(endWord)) {
 			minCount = Math.min(minCount, current.size());
 			result.add(new ArrayList<>(current));
@@ -88,27 +102,18 @@ public class WordLadderII {
 		}
 		if (current.size() > minCount)
 			return;
-		char[] charArray = beginWord.toCharArray();
-
-		for (int i = 0; i < beginWord.length(); i++) {
-			
-			for (char j = 'a'; j <= 'z'; j++) {
-				char temp = charArray[i];
-				charArray[i] = j;
-				String curInStr = new String(charArray);
-
-				if (wordList.contains(curInStr)) {
-					current.add(curInStr);
-					wordList.remove(curInStr);
-					helper(current, result, curInStr, endWord, wordList);
-					current.remove(current.size() - 1);
-					wordList.add(curInStr);
-
+		Set<String> toList = graph.get(beginWord);
+		if(toList==null) return;
+			for(String s:toList) {
+				if(!visiteds.contains(s)) {
+					visiteds.add(s);
+					current.add(s);
+					helper(current, result, s, endWord, visiteds, graph);
+					visiteds.remove(s);
+					current.remove(current.size()-1);
 				}
-				charArray[i] = temp;
 			}
-			
-		}
+		
 	}
 }
 
