@@ -1,7 +1,7 @@
 public class addString {
 	public static void main(String[] args) {
 		/*"6913259244"
-"71103343"*/
+"71103343"   */
 		System.out.println(addStrings("1", "1"));
 	}
 	public static String addStrings(String num1, String num2) {
