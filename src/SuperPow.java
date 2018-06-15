@@ -6,26 +6,36 @@ public class SuperPow {
 		System.out.println(s.superPow(2147483647, new int[] {2,0,0}));
 		//System.out.println(s.superPow(3, new int[] {2,0,0}));
 	}
-    public int superPow(int a, int[] b) { 
-    	int mod =1337;
-    	HashMap<Integer,Integer> dp=new HashMap<>();
-    	dp.put(0, 1);
-    	dp.put(1, a % mod);
-    	int result=1;
-    	int pow=0;
-    	for(int i=b.length-1;i>-1;i--) {
-    		result*=helper(a, (b[i]%mod*helper(10, pow++, dp, mod))%mod, dp, mod);
-    	}
-    	return result%mod;
+
+    public int superPow(int a, int[] b) {
+        return superPowerSub(a, b, b.length-1);
     }
-    private int helper(int a,int b,HashMap<Integer,Integer> dp,int mod) {
-    	if(dp.containsKey(b)) {
-    		return dp.get(b);
-    	}
-    	int c =b/2;
-    	int result=(helper(a, c, dp, mod)*helper(a, c, dp, mod)*helper(a, b-(2*c), dp, mod))%mod;
-    	dp.put(b, result);
-    	return result;
+    
+    /* 递归方法
+    a^[1,2,3,4] = pow(a^[1,2,3], 10) * pow(a, 4)
+    a^[1,2,3] = pow(a^[1,2], 10) * pow(a, 3)
+    a^[1,2] = pow(a^[1], 10) * pow(a, 2)
+    a^[1] = pow(a, 1)
+    */
+    public int superPowerSub(int a, int[] b, int index) {
+        if (index == 0)
+            return pow(a, b[index]) % 1337;
+        int pre = superPowerSub(a, b, index-1);
+        return (pow(pre, 10) * pow(a, b[index])) % 1337;
     }
-   
+    
+    
+    public int pow(int x, int n) {
+        if (n == 0)
+            return 1;
+        if (n == 1)
+            return x % 1337;
+        int half = pow(x, n/2); 
+        if(n%2==0)  
+            return (half*half) % 1337;  
+        else  
+            return (((half*half) % 1337) *(x % 1337)) % 1337; 
+    }
+
+
 }
