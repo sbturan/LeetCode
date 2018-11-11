@@ -1,4 +1,5 @@
 public class Node {
+
     public boolean val;
     public boolean isLeaf;
     public Node topLeft;
