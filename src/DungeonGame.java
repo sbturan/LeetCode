@@ -1,38 +1,45 @@
 public class DungeonGame {
 	public static void main(String[] args) {
-		DungeonGame d=new DungeonGame();
-		System.out.println(d.calculateMinimumHP(new int[][]{{-2,-3,3},{-5,-10,1},{10,30,-5}}));
+		DungeonGame d = new DungeonGame();
+		System.out.println(d.calculateMinimumHP(new int[][] { { -2, -3, 3 }, { -5, -10, 1 }, { 10, 30, -5 } }));
 	}
+
 	public int calculateMinimumHP(int[][] dungeon) {
-	    
-		result=Integer.MAX_VALUE;
-	    helper(dungeon, 0, 0,1,1,new int[dungeon.length][dungeon[0].length]);
-	     return result;
+		int X = dungeon.length;
+		int Y = dungeon[0].length;
+		int[][] dp=new int[X][Y];
+		for(int i=0;i<X;i++) {
+			for(int j=0;j<Y;j++) {
+				dp[i][j]=Integer.MIN_VALUE;
+			}
 		}
-		static int result=Integer.MAX_VALUE;
-		int helper(int[][] dungeon, int posX,int posY,int cur,int res,int[][] dp){
-			  if(dp[posX][posY]!=0){
-				  result=Math.min(result, res+dp[posX][posY]);
-				  return dp[posX][posY];
-			  }
-		     cur+=dungeon[posX][posY];
-		     if(cur<1){
-		    	 res+=1-cur;
-		    	 cur=1;
-		     }
-		     int minimum=Integer.MAX_VALUE-50;
-		     if(posX<dungeon.length-1){
-		    	 minimum=helper(dungeon, posX+1, posY, cur, res,dp);
-		     }
-		     if(posY<dungeon[0].length-1){
-		    	 minimum=Math.min(minimum, helper(dungeon, posX, posY+1, cur, res,dp));
-		     }
-		     dp[posX][posY]=minimum;
-		     if(posX==dungeon.length-1&&posY==dungeon[0].length-1){
-		    	 result=Math.min(result, res);	 
-		     }
-		     return res;
-		     
-			
+		int result=helper(dungeon, X-1, Y-1, dp);
+		for(int i=0;i<X;i++) {
+			for(int j=0;j<Y;j++) {
+				System.out.print(dp[i][j]+" ");
+			}
+			System.out.println();
 		}
+		return result;
+	}
+
+	int helper(int[][] dungeon, int posX, int posY, int[][] dp) {
+        
+		if (posX == 0 && posY == 0) {
+			return dungeon[0][0];
+		}
+		if(dp[posX][posY]>Integer.MIN_VALUE) {
+			return dp[posX][posY];
+		}
+        int max=Integer.MIN_VALUE;
+        if(posX>0) {
+        	max=helper(dungeon, posX-1, posY, dp);
+        }
+        if(posY>0) {
+        	max=Math.max(max, helper(dungeon, posX, posY-1, dp));
+        }
+        max+=dungeon[posX][posY];
+        dp[posX][posY]=max;
+        return max;
+	}
 }
