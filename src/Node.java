@@ -1,3 +1,4 @@
+
 public class Node {
 
     public boolean val;
@@ -18,3 +19,4 @@ public class Node {
         bottomRight = _bottomRight;
     }
 };
+	
