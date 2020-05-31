@@ -1,94 +1,54 @@
-//import java.util.ArrayList;
-//import java.util.Arrays;
-//import java.util.HashMap;
-//import java.util.LinkedHashMap;
-//import java.util.List;
-//import java.util.Map;
-//import java.util.Set;
-//import java.util.stream.Collectors;
-//
-//public class Test {
-//	public static void main(String[] args) {
-//		Test t = new Test();
-////		
-////		System.out.println(
-////				t.minimumHours(4, 5, possibleFeatures, numFeatureRequests, featureRequests));
-//	}
-//	   int minimumHours(int rows, int columns, List<List<Integer> > grid)
-//	    { 
-//		    if(rows==0||columns==0 ||grid==null || grid.get(0)==null) {
-//		    	return 0;
-//		    }
-//	        int result=0;
-//	        int[][] matrix=new int[rows][columns];
-//	     	for(int i=0;i<rows;i++) {
-//        		for(int j=0;j<columns;j++) {
-//        	       matrix[i][j]=grid.get(i).get(j);		
-//        		}
-//	     	}
-//	     	int oneCount=0;
-//	        while (oneCount<rows*columns) {
-//	        	oneCount=0;
-//	        	int[][] matrixNew=new int[rows][columns];
-//	        	for(int i=0;i<rows;i++) {
-//	        		for(int j=0;j<columns;j++) {
-//	        			if(matrix[i][j]==1) {
-//	        				matrixNew[i][j]=1;
-//	        				oneCount++;
-//	        				if(i>0) {
-//	        					matrixNew[i-1][j]=1;
-//	        				}
-//	        				if(i<rows-1) {
-//	        					matrixNew[i+1][j]=1;
-//	        				}
-//	        				if(j>0) {
-//	        					matrixNew[i][j-1]=1;
-//	        				}
-//	        				if(j<columns-1) {
-//	        					matrixNew[i][j+1]=1;
-//	        				}
-//	        			}
-//	        		}
-//	        	}
-//	        	  for (int i = 0; i < matrixNew.length; i++) {
-//	        		  matrix[i] = Arrays.copyOf(matrixNew[i], matrixNew[i].length);
-//	        	  }
-//	        	result++;
-//	        }
-//	        return result-1;
-//	    }
-//	public ArrayList<String> popularNFeatures(int numFeatures, int topFeatures, List<String> possibleFeatures,
-//			int numFeatureRequests, List<String> featureRequests) {
-//		if(topFeatures>numFeatures) {
-//			return new ArrayList<>(featureRequests);
-//		}
-//		if (topFeatures == 0 || featureRequests == null || possibleFeatures == null || numFeatures == 0
-//				|| numFeatureRequests == 0) {
-//			return new ArrayList<String>();
-//		}
-//
-//		HashMap<String, Integer> counts = new HashMap<>();
-//		for (String pf : possibleFeatures) {
-//			for (String fr : featureRequests) {
-//				if (fr.toLowerCase().indexOf(pf.toLowerCase()) > -1) {
-//					counts.put(pf, counts.getOrDefault(pf, 0) + 1);
-//
-//				}
-//			}
-//		}
-////		Map<String, Integer> sortedMap = counts.entrySet().stream()
-////				.sorted((Map.Entry.<String, Integer>comparingByValue().reversed()).)
-////				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-//		ArrayList<String> result = new ArrayList<String>();
-//		Set<String> keySet = sortedMap.keySet();
-//		int i = 0;
-//		for (String s : keySet) {
-//			result.add(s);
-//			i++;
-//			if (i == topFeatures) {
-//				break;
-//			}
-//		}
-//		return result;
-//	}
-//}
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+
+public class Test {
+	public static void main(String[] args) {
+		int[] is = new int[] { 1, 2, 2, 0, 5, 0,0 };
+		List<Integer> list = new ArrayList<>();
+		for (int i : is)
+			list.add(i);
+		System.out.println(totalTriplets(list, 0));
+	}
+
+	public static long totalTriplets(List<Integer> capacity, long desiredCapacity) {
+
+		HashMap<Long, HashSet<Integer>> couples = new HashMap<>();// çaprýmý 15 olan 2,3 ve 3,4 varsa 15=>2,3
+		for (int i = 0; i < capacity.size() - 1; i++) {
+			long multiply = capacity.get(i) * capacity.get(i + 1);
+			HashSet<Integer> current;
+			if (couples.containsKey(multiply)) {
+				current = couples.get(multiply);
+			} else {
+				current = new HashSet<>();
+			}
+			current.add(i);
+			couples.put(multiply, current);
+		}
+		int result = 0;
+		for (int i = 0; i < capacity.size(); i++) {
+			int cur = capacity.get(i);
+			if (cur != 0 && desiredCapacity % cur == 0) {
+				long target = desiredCapacity / cur;
+				if (couples.containsKey(target)) {
+					HashSet<Integer> set = couples.get(target);
+					result+=set.size();
+					if(set.contains(i))
+						result--;
+					if(set.contains(i-1))
+						result--;
+					if(set.contains(i-2))
+						result--;
+				}
+			} else if (desiredCapacity == 0 && cur == 0) {
+				result+=capacity.size()-2;
+                if(i<capacity.size()-1)
+                	result--;
+                if(i<capacity.size()-2)
+                	result--;
+			}
+		}
+		return result;
+	}
+}
