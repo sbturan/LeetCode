@@ -5,7 +5,7 @@ import java.util.Set;
 
 public class NumberofSquarefulArrays {
 	public static void main(String[] args) {
-		System.out.println(new NumberofSquarefulArrays().numSquarefulPerms(new int[] { 17,8,1}));
+     System.out.println(new NumberofSquarefulArrays().numSquarefulPerms(new int[] { 2,2}));
 	}
 
 	 public int numSquarefulPerms(int[] A) {
@@ -49,15 +49,13 @@ public class NumberofSquarefulArrays {
 				if(usedNumber.contains(A[i]))
 					continue;
 				usedNumber.add(A[i]);
-				Set<Integer> usedInx =new HashSet<Integer>();
-				usedInx.add(i);
+				int usedInx = 1<<i;
 				result+=helper(i, usedInx, arr, 1, A.length,A);
-				usedInx.remove(i);
 			}
 			return result;
 		}
 		
-		private int helper(int curIndex,Set<Integer> usedInx,List<Integer>[] arr,int curLength,int length,int[] A) {
+		private int helper(int curIndex,int usedInx,List<Integer>[] arr,int curLength,int length,int[] A) {
 		   if(curLength==length) {
 			   return 1;
 		   }
@@ -66,11 +64,11 @@ public class NumberofSquarefulArrays {
 		   for(int i:arr[curIndex]) {
 			    if(usedNumber.contains(A[i]))
 				   continue;
-			   if(!usedInx.contains(i)) {
+			    if((usedInx&1<<i)==0) {
 				   usedNumber.add(A[i]);
-				   usedInx.add(i);
+				   usedInx|=1<<i;
 				   result+=helper(i, usedInx, arr, curLength+1, length,A); 
-				   usedInx.remove(i);
+				   usedInx^=1<<i;
 			   }
 		   }
 		   return result;
