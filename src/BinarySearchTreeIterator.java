@@ -2,7 +2,7 @@ public class BinarySearchTreeIterator {
 
 	public class BSTIterator {
 
-		class TreeNodeWParent {
+		public class TreeNodeWParent {
 			TreeNode node;
 			TreeNodeWParent parent;
 		}
@@ -20,18 +20,19 @@ public class BinarySearchTreeIterator {
 		}
 
 		private void findNext(TreeNodeWParent node) {
-			if (node.node.left == null) {
+			if (node.node.left != null) {
+				TreeNodeWParent cur = node;
+				while (cur.node.left != null) {
+					TreeNodeWParent left = new TreeNodeWParent();
+					left.node = cur.node.left;
+					cur.node.left = null;
+					left.parent = cur;
+					next = left;
+					cur = left;
+				}
+			} else {
 				next = node;
 				return;
-			}
-			TreeNodeWParent cur = node;
-			while (cur.node.left != null) {
-				TreeNodeWParent left = new TreeNodeWParent();
-				left.node = cur.node.left;
-				cur.node.left = null;
-				left.parent = cur;
-				next = left;
-				cur = left;
 			}
 		}
 
