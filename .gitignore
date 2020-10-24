@@ -1,2 +1,8 @@
 /bin/
+/.idea/.gitignore
+/.idea/.name
+/Leetcode.iml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/vcs.xml
 /numbers.txt
