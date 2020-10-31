@@ -1,72 +1,48 @@
-import java.util.ArrayList;
-import java.util.List;
+
 
 public class RecoverBinarySearchTree {
 	public static void main(String[] args) {
 		 
 		TreeNode t1=new TreeNode(0);
 		t1.left=new TreeNode(1);
-		recoverTree(t1);
+		new RecoverBinarySearchTree().recoverTree(t1);
 	}
-	public static  void recoverTree(TreeNode root) {
+	TreeNode first;
+	TreeNode second;
+	TreeNode pre;
 
-		parents = new ArrayList<>();
-		TreeNode firstWrong = getWrongNodeParent(root, null);
-		TreeNode secondWrong = getWrongNodeParent(root, firstWrong);
-		TreeNode parent1 = parents.get(0);
-		TreeNode parent2 = parents.get(1);
+	public void inorder(TreeNode root){
+		if(root==null)
+			return;
 
-		TreeNode temp;
-		temp = firstWrong.left;
-		firstWrong.left = secondWrong.left;
-		secondWrong.left = temp;
+		inorder(root.left);
 
-		temp = firstWrong.right;
-		firstWrong.right = secondWrong.right;
-		secondWrong.right = temp;
+		if(pre==null){
+			pre=root;
+		}else{
+			if(root.val<pre.val){
+				if(first==null){
+					first=pre;
+				}
 
-		if (parent1.left != null && parent1.left.val == firstWrong.val) {
-			if (parent2.left != null && parent2.left.val == secondWrong.val) {
-				parent1.left = secondWrong;
-				parent2.left = firstWrong;
-			} else {
-				parent1.left = secondWrong;
-				parent2.right = firstWrong;
+				second=root;
 			}
-		} else {
-			if (parent2.left != null && parent2.left.val == secondWrong.val) {
-				parent1.right = secondWrong;
-				parent2.left = firstWrong;
-			} else {
-				parent1.right = secondWrong;
-				parent2.right = firstWrong;
-			}
+			pre=root;
 		}
 
+		inorder(root.right);
 	}
 
-	private static List<TreeNode> parents;
+	public void recoverTree(TreeNode root) {
+		if(root==null)
+			return;
 
-	private static TreeNode getWrongNodeParent(TreeNode root, TreeNode firstNode) {
-
-		if (root == null)
-			return null;
-		if (root.left != null && root.left.val > root.val) {
-			if (firstNode == null || root.left.val != firstNode.val) {
-				parents.add(root);
-				return root.left;
-			}
+		inorder(root);
+		if(second!=null && first !=null){
+			int val = second.val;
+			second.val = first.val;
+			first.val = val;
 		}
-		if (root.right != null && root.right.val < root.val) {
-			if (firstNode == null || root.right.val != firstNode.val) {
-				parents.add(root);
-				return root.right;
-			}
-		}
-		TreeNode wrongNode = getWrongNodeParent(root.left, firstNode);
-		if (wrongNode != null)
-			return wrongNode;
-		return getWrongNodeParent(root.right, firstNode);
 
 	}
 }
