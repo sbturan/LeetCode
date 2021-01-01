@@ -1,45 +1,39 @@
 public class DungeonGame {
-	public static void main(String[] args) {
-		DungeonGame d = new DungeonGame();
-		System.out.println(d.calculateMinimumHP(new int[][] { { -2, -3, 3 }, { -5, -10, 1 }, { 10, 30, -5 } }));
-	}
+    public static void main(String[] args) {
+        DungeonGame d = new DungeonGame();
 
-	public int calculateMinimumHP(int[][] dungeon) {
-		int X = dungeon.length;
-		int Y = dungeon[0].length;
-		int[][] dp=new int[X][Y];
-		for(int i=0;i<X;i++) {
-			for(int j=0;j<Y;j++) {
-				dp[i][j]=Integer.MIN_VALUE;
+        System.out.println(d.calculateMinimumHP(new int[][]{{1, -3, 3}, {0, -2, 0}, {-3, -3, -3}}));
+    }
+
+
+    public int calculateMinimumHP(int[][] dungeon) {
+		if (dungeon == null || dungeon.length == 0 || dungeon[0].length == 0) return 0;
+
+		int m = dungeon.length;
+		int n = dungeon[0].length;
+
+		int[][] health = new int[m][n];
+
+		health[m - 1][n - 1] = Math.max(1 - dungeon[m - 1][n - 1], 1);
+
+		for (int i = m - 2; i >= 0; i--) {
+			health[i][n - 1] = Math.max(health[i + 1][n - 1] - dungeon[i][n - 1], 1);
+		}
+
+		for (int j = n - 2; j >= 0; j--) {
+			health[m - 1][j] = Math.max(health[m - 1][j + 1] - dungeon[m - 1][j], 1);
+		}
+
+		for (int i = m - 2; i >= 0; i--) {
+			for (int j = n - 2; j >= 0; j--) {
+				int down = Math.max(health[i + 1][j] - dungeon[i][j], 1);
+				int right = Math.max(health[i][j + 1] - dungeon[i][j], 1);
+				health[i][j] = Math.min(right, down);
 			}
 		}
-		int result=helper(dungeon, X-1, Y-1, dp);
-		for(int i=0;i<X;i++) {
-			for(int j=0;j<Y;j++) {
-				System.out.print(dp[i][j]+" ");
-			}
-			System.out.println();
-		}
-		return result;
-	}
 
-	int helper(int[][] dungeon, int posX, int posY, int[][] dp) {
-        
-		if (posX == 0 && posY == 0) {
-			return dungeon[0][0];
-		}
-		if(dp[posX][posY]>Integer.MIN_VALUE) {
-			return dp[posX][posY];
-		}
-        int max=Integer.MIN_VALUE;
-        if(posX>0) {
-        	max=helper(dungeon, posX-1, posY, dp);
-        }
-        if(posY>0) {
-        	max=Math.max(max, helper(dungeon, posX, posY-1, dp));
-        }
-        max+=dungeon[posX][posY];
-        dp[posX][posY]=max;
-        return max;
-	}
+		return health[0][0];
+    }
+
+
 }
