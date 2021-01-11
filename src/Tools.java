@@ -19,4 +19,16 @@ public class Tools {
         }
         return nodes[0];
     }
+    public static ListNode arrayToListNode(int[] arr){
+        if(arr.length==0)
+            return null;
+        ListNode head=new ListNode(arr[0]);
+        ListNode cur=head;
+        for(int i=1;i<arr.length;i++){
+            ListNode curNode=new ListNode(arr[i]);
+            cur.next=curNode;
+            cur=cur.next;
+        }
+        return head;
+    }
 }
