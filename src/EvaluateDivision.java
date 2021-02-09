@@ -1,50 +1,61 @@
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class EvaluateDivision {
-	public double[] calcEquation(String[][] equations, double[] values, String[][] queries) {
-	       
-		HashMap<String,List<String[]>> map=new HashMap<>();
-		for(int i=0;i<equations.length;i++){
-			String divided=equations[i][0];
-			String divisor=equations[i][1];
+	public static void main(String[] args) {
+		double a=2;
+		double b=1d/3;
+		System.out.println(a/b);
+	}
+	public double[] calcEquation(List<List<String>> equations, double[] values, List<List<String>> queries) {
+		HashMap<String,HashMap<String,Double>> map=new HashMap<>();
+		for(int i=0;i<equations.size();i++){
+			String divided=equations.get(i).get(0);
+			String divisor=equations.get(i).get(1);
 			double val=values[i];
-			String a[]=new String[]{divisor,String.valueOf(val)};
-			List<String[]> orDefault = map.getOrDefault(divided, new ArrayList<>());
-			orDefault.add(a);
-			map.put(divided, orDefault);
-			String b[]=new String[]{divided,String.valueOf((1.0)/val)};
-			orDefault = map.getOrDefault(divisor, new ArrayList<>());
-			orDefault.add(b);
-			map.put(divisor, orDefault);
+			if(!map.containsKey(divided)){
+				map.put(divided,new HashMap<>());
+			}
+		   map.get(divided).put(divisor,val);
+			if(!map.containsKey(divisor)){
+				map.put(divisor,new HashMap<>());
+			}
+			map.get(divisor).put(divided,1/val);
+
 		}
-		double[] result=new double[queries.length];
-		for(int i=0;i<queries.length;i++){
-			result[i]=getResult(queries[i][0], queries[i][1], new HashSet<>(), map,1.0);
+		double[] result=new double[queries.size()];
+		for(int i=0;i<queries.size();i++){
+			List<String> cur = queries.get(i);
+			double curResult=-1;
+			if(map.containsKey(cur.get(1))){
+			  curResult=helper(cur.get(0),cur.get(1),map,new HashSet<>());;
+			}
+			result[i]=curResult;
 		}
 		return result;
 	}
-	private double getResult(String a,String b,Set<String> path,HashMap<String,List<String[]>> map,double mult){
-		if(path.contains(a))return -1.0;
-		if(a.equals(b)&&map.containsKey(a)) return 1*mult;
-		List<String[]> list = map.get(a);
-		if(list==null||list.isEmpty()) return -1.0;
-		for(String[] array:list){
-			if(array[0]==b){
-				return Double.valueOf(array[1])*mult;
-			}
+	private double helper(String a, String b, HashMap<String,HashMap<String,Double>> map, HashSet<String> visited){
+		if(visited.contains(a)||!map.containsKey(a))
+			return -1;
+		if(a==b)
+			return 1;
+		HashMap<String, Double> values = map.get(a);
+		if(values.containsKey(b))
+			return values.get(b);
+		visited.add(a);
+		for(String s:values.keySet()){
+			double res=helper(s,b,map,visited);
+           if(res!=-1){
+           	res*= values.get(s);
+           	values.put(b,res);
+           	map.get(b).put(a,1/res);
+           	return res;
+		   }
 		}
-		path.add(a);
-		for(String[] array:list){
-			double result = getResult(array[0], b, path, map,mult*Double.valueOf(array[1]));
-			if(result!=-1){
-				return result;
-			}
-		}
-		path.remove(a);
-		return -1.0;
+		visited.remove(a);
+		values.put(b,-1.0);
+		map.get(b).put(a,-1.0);
+		return -1;
 	}
 }
