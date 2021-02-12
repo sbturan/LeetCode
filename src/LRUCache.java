@@ -1,93 +1,85 @@
-import java.util.HashMap;
 
 
-public class LRUCache {
+
+class LRUCache {
 	public static void main(String[] args) {
-//		LRUCache cache = new LRUCache(2);
-//		cache.put(2, 1);
-//		cache.put(3, 2);
-//		System.out.println(cache.get(3));
-//		System.out.println(cache.get(2));
-//		cache.put(4, 3);
-//		System.out.println(cache.get(2));
-//		System.out.println(cache.get(3));
-//		System.out.println(cache.get(4));
-	LRUCache cache = new LRUCache(2);
-	cache.put(1, 1);
-	cache.put(2, 2);
-	System.out.println(cache.get(1));
-	cache.put(3, 3);
-	System.out.println(cache.get(2));
-	cache.put(4, 4);
-	for (int i : new int[] {1,3,4}) {
-		System.out.println(i + " " + cache.get(i));
+		LRUCache cache=new LRUCache(3);
+		cache.put(1,1);
+		cache.put(2,2);
+		cache.put(3,3);
+		cache.put(4,4);
+		System.out.println(cache.get(4));
+		System.out.println(cache.get(3));
+		System.out.println(cache.get(2));
+		System.out.println(cache.get(1));
+		cache.put(5,5);
+		System.out.println(cache.get(1));
+		System.out.println(cache.get(2));
+		System.out.println(cache.get(3));
+		System.out.println(cache.get(4));
+		System.out.println(cache.get(5));
 	}
-}
-	class DLinkedNode {
-		int key;
-		int value;
-		DLinkedNode pre;
-		DLinkedNode post;
+    class Node{
+    	int key;
+    	int val;
+    	Node prev;
+    	Node next;
+    	public Node(int key,int val){
+    		this.val=val;
+    		this.key=key;
+		}
 	}
-
-	int capacity;
-	HashMap<Integer, DLinkedNode> map;
-	DLinkedNode tail, head;
-
+	Node[] map;
+    Node head;
+    Node tail;
+    int capacity;
+    int size=0;
 	public LRUCache(int capacity) {
-		this.capacity = capacity;
-		map = new HashMap<>();
+       map=new Node[3001];
+       head=new Node(-1,-1);
+       tail=new Node(-1,-1);
+       head.next=tail;
+       tail.prev=head;
+       this.capacity=capacity;
 	}
 
 	public int get(int key) {
-		if (map.containsKey(key)) {
-			DLinkedNode node = map.get(key);
-			addToHead(key);
-			return node.value;
-		}
-		return -1;
+      if(map[key]==null)
+      	return -1;
+		Node node = map[key];
+		putNodeToTail(node);
+		return node.val;
 	}
+
+	private void putNodeToTail(Node node) {
+		node.prev.next= node.next;
+		node.next.prev= node.prev;
+		tail.prev.next= node;
+		node.prev=tail.prev;
+		node.next=tail;
+		tail.prev= node;
+	}
+
 	public void put(int key, int value) {
-		DLinkedNode cur = map.get(key);
-	  if(cur!=null) {
-		  addToHead(key);
-		  cur.value=value;
-	  }else {
-		  if(map.keySet().size()==capacity)
-			  delete();
-		  cur=new DLinkedNode();
-		  cur.key=key;
-		  cur.value=value;
-		  map.put(key,cur);
-		  addToHead(cur.key);
-	  }
-	}
-	private void delete() {
-		if(tail.pre!=null)
-			tail.pre.post=null;
-		map.remove(tail.key);
-		tail=tail.pre;
-	
-	}
-	private void addToHead(int key) {
-		DLinkedNode cur = map.get(key);
-		if(head==null) {
-			head=cur;
-			tail=cur;
-			return;
+		if (map[key]==null) {
+          Node newNode=new Node(key,value);
+          if(size==capacity){
+			  Node removed = head.next;
+			  head.next=removed.next;
+			  removed.next.prev=head;
+			  map[removed.key]=null;
+			  size--;
+		  }
+          map[key]=newNode;
+          size++;
+          tail.prev.next=newNode;
+          newNode.prev=tail.prev;
+          newNode.next=tail;
+          tail.prev=newNode;
+		}else{
+			Node node = map[key];
+			node.val=value;
+			putNodeToTail(node);
 		}
-		if(head==cur) {
-			return;
-		}
-		if(cur.pre!=null)
-		cur.pre.post=cur.post;
-		if(cur.post!=null)
-			cur.post.pre=cur.pre;
-		cur.post=head;
-		head.pre=cur;
-		head=cur;
-		if(tail==cur)
-			tail=cur.pre;
-		head.pre=null;
 	}
 }
