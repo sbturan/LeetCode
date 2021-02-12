@@ -1,119 +1,129 @@
 import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.TreeMap;
 
 public class LFUCache {
-	class Node {
-		public int count = 0;
-		public LinkedHashSet<Integer> keys = null;
-		public Node prev = null, next = null;
+    public static void main(String[] args) {
+        LFUCache lfuCache = new LFUCache(2);
+        lfuCache.put(1, 1);
+        lfuCache.put(2, 2);
+        System.out.println(lfuCache.get(1));
+        lfuCache.put(3, 3);
+        System.out.println(lfuCache.get(2));
+        System.out.println(lfuCache.get(3));
+        lfuCache.put(4, 4);
+        System.out.println(lfuCache.get(1));
+        System.out.println(lfuCache.get(3));
+        System.out.println(lfuCache.get(4));
+    }
 
-		public Node(int count) {
-			this.count = count;
-			keys = new LinkedHashSet<Integer>();
-			prev = next = null;
-		}
-	}
+    class Node {
+        Node prev;
+        Node next;
+        int val;
+        int key;
+        int counter;
 
-	private Node head = null;
-	private int cap = 0;
-	private HashMap<Integer, Integer> valueHash = null;
-	private HashMap<Integer, Node> nodeHash = null;
+        public Node(int val) {
+            this.val = val;
+            this.counter = 1;
+        }
+    }
 
-	public LFUCache(int capacity) {
-		this.cap = capacity;
-		valueHash = new HashMap<Integer, Integer>();
-		nodeHash = new HashMap<Integer, Node>();
-	}
+    HashMap<Integer, Node> map;
+    TreeMap<Integer, Node> lastNodeMap;
+    Node headDump;
+    int capacity;
 
-	public int get(int key) {
-		if (valueHash.containsKey(key)) {
-			increaseCount(key);
-			return valueHash.get(key);
-		}
-		return -1;
-	}
+    public LFUCache(int capacity) {
+        map = new HashMap<>(capacity + 1);
+        lastNodeMap = new TreeMap<>();
+        this.capacity = capacity;
+        headDump = new Node(-1);
+    }
 
-	public void set(int key, int value) {
-		if (cap == 0)
-			return;
-		if (valueHash.containsKey(key)) {
-			valueHash.put(key, value);
-		} else {
-			if (valueHash.size() < cap) {
-				valueHash.put(key, value);
-			} else {
-				removeOld();
-				valueHash.put(key, value);
-			}
-			addToHead(key);
-		}
-		increaseCount(key);
-	}
+    public int get(int key) {
+        if (!map.containsKey(key))
+            return -1;
+        Node node = map.get(key);
+        node.counter++;
+        reorderList(node);
+        return node.val;
+    }
 
-	private void addToHead(int key) {
-		if (head == null) {
-			head = new Node(0);
-			head.keys.add(key);
-		} else if (head.count > 0) {
-			Node node = new Node(0);
-			node.keys.add(key);
-			node.next = head;
-			head.prev = node;
-			head = node;
-		} else {
-			head.keys.add(key);
-		}
-		nodeHash.put(key, head);
-	}
+    private void reorderList(Node node) {
+        if (node.next == null) {
+            if (node.prev == headDump || node.prev.counter != node.counter - 1) {
+                lastNodeMap.remove(node.counter - 1);
+            } else {
+                lastNodeMap.put(node.counter - 1, node.prev);
+            }
+            lastNodeMap.put(node.counter, node);
+            return;
+        }
+        if (node.prev != null)
+            node.prev.next = node.next;
+        if (node.next != null)
+            node.next.prev = node.prev;
+        if (lastNodeMap.get(node.counter - 1) == node) {
+            if (node.prev == headDump || node.prev.counter != node.counter - 1) {
+                lastNodeMap.remove(node.counter - 1);
+            } else {
+                lastNodeMap.put(node.counter - 1, node.prev);
+            }
+        }
+        Node cur, prev;
+        Integer key = lastNodeMap.lowerKey(node.counter + 1);
+        if (key == null) {
+            prev = headDump;
+        } else {
+            prev = lastNodeMap.get(key);
+        }
+        cur = prev.next;
+        prev.next = node;
+        node.next = cur;
+        node.prev = prev;
+        if (cur != null) {
+            cur.prev = node;
+        }
+        lastNodeMap.put(node.counter, node);
+    }
 
-	private void increaseCount(int key) {
-		Node node = nodeHash.get(key);
-		node.keys.remove(key);
-
-		if (node.next == null) {
-			node.next = new Node(node.count + 1);
-			node.next.prev = node;
-			node.next.keys.add(key);
-		} else if (node.next.count == node.count + 1) {
-			node.next.keys.add(key);
-		} else {
-			Node tmp = new Node(node.count + 1);
-			tmp.keys.add(key);
-			tmp.prev = node;
-			tmp.next = node.next;
-			node.next.prev = tmp;
-			node.next = tmp;
-		}
-
-		nodeHash.put(key, node.next);
-		if (node.keys.size() == 0)
-			remove(node);
-	}
-
-	private void removeOld() {
-		if (head == null)
-			return;
-		int old = 0;
-		for (int n : head.keys) {
-			old = n;
-			break;
-		}
-		head.keys.remove(old);
-		if (head.keys.size() == 0)
-			remove(head);
-		nodeHash.remove(old);
-		valueHash.remove(old);
-	}
-
-	private void remove(Node node) {
-		if (node.prev == null) {
-			head = node.next;
-		} else {
-			node.prev.next = node.next;
-		}
-		if (node.next != null) {
-			node.next.prev = node.prev;
-		}
-	}
+    public void put(int key, int value) {
+        if (!map.containsKey(key)) {
+            if (capacity == 0)
+                return;
+            Node head = headDump.next;
+            if (map.size() == capacity) {
+                map.remove(head.key);
+                if (lastNodeMap.get(head.counter) == head) {
+                    lastNodeMap.remove(head.counter);
+                }
+                headDump.next = head.next;
+                if (head.next != null) {
+                    head.next.prev = headDump;
+                }
+            }
+            head = headDump.next;
+            Node newNode = new Node(value);
+            newNode.key = key;
+            map.put(key, newNode);
+            Node cur = head, prev = headDump;
+            if (lastNodeMap.containsKey(1)) {
+                prev = lastNodeMap.get(1);
+                cur = prev.next;
+            }
+            newNode.prev = prev;
+            newNode.next = cur;
+            prev.next = newNode;
+            if (cur != null)
+                cur.prev = newNode;
+            lastNodeMap.put(1, newNode);
+            return;
+        }
+        Node node = map.get(key);
+        node.val = value;
+        node.counter++;
+        reorderList(node);
+    }
 
 }
