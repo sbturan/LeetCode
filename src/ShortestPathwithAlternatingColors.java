@@ -1,5 +1,7 @@
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class ShortestPathwithAlternatingColors {
     // unresolved
@@ -26,39 +28,32 @@ public class ShortestPathwithAlternatingColors {
             }
             blue[i[0]].add(i[1]);
         }
+
         int[] result=new int[n];
-        for(int i=0;i<n;i++){
-            int redR = helper(0, i, red, blue, true, dpRed, dpBlue);
-            int blueR = helper(0, i, red, blue, false, dpRed, dpBlue);
-            int curResult=Integer.min(
-                    redR,
-                    blueR
-           );
-           if(curResult==Integer.MAX_VALUE)
-               curResult=-1;
-           dpRed[0][i]=redR;
-           dpBlue[0][i]=blueR;
-           result[i]=curResult;
+
+        for(int i=1;i<n;i++){
+            boolean isRed=true;
+            for(int j=0;j<2;j++){
+                isRed=!isRed;
+                Queue q=new LinkedList(isRed?red[0]:blue[0]);
+                int level=0;
+                boolean reached=false;
+                boolean curRed=isRed;
+                while (q.isEmpty()&&!reached){
+                    level++;
+                    int size=q.size();
+
+                    for(int k=0;k<size;k++){
+
+                    }
+                }
+                if(reached)
+                    result[i]=level;
+                else
+                    result[i]=-1;
+            }
         }
-        return result;
-    }
-    private int helper(int cur,int target,HashSet[] red,HashSet[] blue,boolean isRed,Integer[][] dpRed,Integer[][] dpBlue){
-        if (cur == target)
-            return 0;
-        Integer[][] dp = isRed ? dpRed : dpBlue;
-        if(dp[cur][target]!=null)
-            return dp[cur][target];
-        int result = Integer.MAX_VALUE;
-        HashSet<Integer>[] curSet = isRed ? red : blue;
-        if(curSet[cur]==null)
-            return result;
-        dp[cur][target]=result;
-        for(int i:curSet[cur]){
-           result=Math.min(result,helper(i,target,red,blue,!isRed,dpRed,dpBlue));
-        }
-       if(result!=Integer.MAX_VALUE)
-           result++;
-       dp[cur][target]=null;
        return result;
     }
+
 }
