@@ -1,23 +1,34 @@
-public class LongestRepeatingCharacterReplacement {
-	public static void main(String[] args) {
-		LongestRepeatingCharacterReplacement l=new LongestRepeatingCharacterReplacement();
-		System.out.println(l.characterReplacement("ABBB", 1));
-	}
 
-	public int characterReplacement(String s, int k) {
-		
-		  int len = s.length();
-	        int[] count = new int[26];
-	        int start = 0, maxCount = 0, maxLength = 0;
-	        for (int end = 0; end < len; end++) {
-	            maxCount = Math.max(maxCount, ++count[s.charAt(end) - 'A']);
-	            while (end - start + 1 - maxCount > k) {
-	                count[s.charAt(start) - 'A']--;
-	                start++;
-	            }
-	            maxLength = Math.max(maxLength, end - start + 1);
-	        }
-	        return maxLength;
-		
-	}
+
+public class LongestRepeatingCharacterReplacement {
+    public static void main(String[] args) {
+        LongestRepeatingCharacterReplacement l = new LongestRepeatingCharacterReplacement();
+        System.out.println(l.characterReplacement("ABAB", 2));
+    }
+
+    public int characterReplacement(String s, int k) {
+
+        boolean exists[] = new boolean[26];
+        char[] chars = s.toCharArray();
+        for (char c : chars) {
+            exists[c - 'A'] = true;
+        }
+        int result = 0;
+        for (int i = 0; i < 26; i++) {
+            if (exists[i]) {
+              char cur=(char)(i+'A');
+              int temp=k,start=0,end=0;
+              while (end<s.length()){
+              	  if(chars[end++]!=cur){
+              	  	temp--;
+				  }
+              	  if(temp<0&&chars[start++]!=cur){
+              	  	 temp++;
+				  }
+			  }
+              result=Math.max(result,end-start);
+            }
+        }
+        return result;
+    }
 }
