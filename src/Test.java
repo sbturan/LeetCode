@@ -1,5 +1,3 @@
-import java.util.Arrays;
-
 public class Test {
     public static int[] GetMaxSum(int a[]) {
         int total = 0;
@@ -27,7 +25,8 @@ public class Test {
 
     // Driver code
     public static void main(String args[]) {
-        Arrays.stream(GetMaxSum(new int[]{1, -2, 2, 4, 5, -1, 10, -5})).forEach(i -> System.out.print(i + " "));
-        System.out.println();
+        /*Arrays.stream(GetMaxSum(new int[]{1, -2, 2, 4, 5, -1, 10, -5})).forEach(i -> System.out.print(i + " "));
+        System.out.println();*/
+        System.out.println(1^1);
     }
 }

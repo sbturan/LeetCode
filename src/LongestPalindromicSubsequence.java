@@ -21,6 +21,7 @@ public class LongestPalindromicSubsequence {
 
 "Consulted perpetual of pronounce me delivered. Too months nay end change relied who beauty wishes matter. Shew of john real park so rest we on. Ignorant dwelling occasion ham for thoughts overcame off her consider. Polite it elinor is depend. His not get talked effect worthy barton. Household shameless incommode at no objection behaviour. Especially do at he possession insensible sympathize boisterous it. Songs he on an widen me event truth. Certain law age brother sending amongst why covered.";
 		System.out.println(longestPalindromeSubseq(a.concat(a).concat(a).concat(a)));
+        System.out.println(longestPalindromeSubseq2(a.concat(a).concat(a).concat(a)));
 	}
 
 	public static int longestPalindromeSubseq(String s) {
@@ -39,4 +40,22 @@ public class LongestPalindromicSubsequence {
         return dp[0][s.length()-1];
 
 	}
+    public static int longestPalindromeSubseq2(String s) {
+        return helper(s, 0, s.length() - 1, new Integer[s.length()][s.length()]);
+    }
+
+    private static int helper(String s, int i, int j, Integer[][] memo) {
+        if (memo[i][j] != null) {
+            return memo[i][j];
+        }
+        if (i > j)      return 0;
+        if (i == j)     return 1;
+
+        if (s.charAt(i) == s.charAt(j)) {
+            memo[i][j] = helper(s, i + 1, j - 1, memo) + 2;
+        } else {
+            memo[i][j] = Math.max(helper(s, i + 1, j, memo), helper(s, i, j - 1, memo));
+        }
+        return memo[i][j];
+    }
 }
