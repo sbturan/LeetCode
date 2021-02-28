@@ -27,6 +27,12 @@ public class Test {
     public static void main(String args[]) {
         /*Arrays.stream(GetMaxSum(new int[]{1, -2, 2, 4, 5, -1, 10, -5})).forEach(i -> System.out.print(i + " "));
         System.out.println();*/
-        System.out.println(1^1);
+        System.out.println(9&12);
+        System.out.println(9&12&3);
+        System.out.println(12&3);
+        System.out.println(3&7);
+        System.out.println(3&7&15);
+        System.out.println(7&15);
+
     }
 }
