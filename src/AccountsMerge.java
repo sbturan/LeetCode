@@ -17,6 +17,7 @@ public class AccountsMerge {
 		System.out.println(new AccountsMerge().accountsMerge(accounts));
 	}
 
+
 	class DSU {
 		int[] parent;
 

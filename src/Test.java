@@ -1,5 +1,6 @@
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.PriorityQueue;
 
 public class Test {
     public static int[] GetMaxSum(int a[]) {
@@ -30,7 +31,10 @@ public class Test {
     public static void main(String args[]) {
         /*Arrays.stream(GetMaxSum(new int[]{1, -2, 2, 4, 5, -1, 10, -5})).forEach(i -> System.out.print(i + " "));
         System.out.println();*/
-        longestSubarray(new int[]{10,1,2,4,7,2},5);
+//        longestSubarray(new int[]{10,1,2,4,7,2},5);
+        //System.out.println(removeDuplicates("yfttttfbbbbnnnnffbgffffgbbbbgssssgthyyyy",4));
+
+
 
     }
     public static int longestSubarray(int[] A, int limit) {
@@ -49,5 +53,36 @@ public class Test {
             }
         }
         return j - i;
+    }
+
+    class Node{
+        int x;
+        int y;
+        int powTotal;
+        public Node(int x,int y){
+            this.x=x;
+            this.y=y;
+            this.powTotal=(int)(Math.pow(x,2)+Math.pow(y,2));
+        }
+    }
+    public int[][] kClosest(int[][] points, int k) {
+        // max x^2 + y^2
+        PriorityQueue<Node> q=new PriorityQueue<Node>((i, j)->j.powTotal-i.powTotal);
+        for(int[] i:points){
+            Node cur=new Node(i[0],i[1]);
+            if(q.size()<k){
+                q.add(cur);
+            }else if(q.peek().powTotal>cur.powTotal){
+                q.poll();
+                q.add(cur);
+            }
+        }
+        int[][] result=new int[k][2];
+        for(int i=0;i<k;i++){
+            Node cur=q.poll();
+            result[i]=new int[]{cur.x,cur.y};
+        }
+        return result;
+
     }
 }
