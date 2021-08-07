@@ -13,7 +13,7 @@ public class VowelSpellchecker {
         HashSet<String> original=new HashSet<>();
         HashMap<String, String> capitalization=new HashMap<>();
         HashMap<String, String> consonants=new HashMap<>();
-        HashSet<Character> vowels=new HashSet<>(){{
+        HashSet<Character> vowels=new HashSet<Character>(){{
             add('a');
             add('e');
             add('i');
