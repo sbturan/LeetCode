@@ -1,35 +1,24 @@
-import java.util.Arrays;
+import java.util.PriorityQueue;
 
 public class MinimumPathSum {
-	public int minPathSum(int[][] grid) {
-		if (grid == null)
-			return 0;
-		int row = grid.length;
-		int column = grid[0].length;
-		int dp[][] = new int[row][column];
-
-		return findMinPath(0, 0, grid, dp, row, column);
+	public static void main(String[] args) {
+		System.out.println(new MinimumPathSum().minPathSum(new int[][]{{1,3,1},{1,5,1},{4,2,1}}));
+		PriorityQueue<Integer> q=new PriorityQueue<>((a,b)->b-a);
 	}
-
-	private int findMinPath(int i, int j, int[][] grid, int[][] dp, int row, int column) {
-
-		if (i >= row - 1 && j >= column - 1)
-			return grid[i][j];
-		if (dp[i][j] != 0)
-			return dp[i][j];
-		int value = grid[i][j];
-		if (i == row - 1) {
-			dp[i][j] = value + findMinPath(i, j + 1, grid, dp, row, column);
-			return dp[i][j];
-		}
-		if (j == column - 1) {
-			dp[i][j] = value + findMinPath(i + 1, j, grid, dp, row, column);
-			return dp[i][j];
-		}
-
-		dp[i][j] = value
-				+ Math.min(findMinPath(i + 1, j, grid, dp, row, column), findMinPath(i, j + 1, grid, dp, row, column));
-		return dp[i][j];
-
+	public int minPathSum(int[][] grid) {
+		int[][] dp=new int[grid.length][grid[0].length];
+		return helper(0,0,0,grid,dp);
+	}
+	private int helper(int current,int i,int j,int[][] grid,int[][] dp){
+		if(i<0||i==grid.length||j<0||j==grid[0].length)
+			return Integer.MAX_VALUE;
+		if(i==grid.length-1 && j==grid[0].length-1)
+			return current+grid[i][j];
+		if(dp[i][j]>0)
+			return dp[i][j]+current;
+		int min=helper(current+grid[i][j],i+1,j,grid,dp);
+		min=Math.min(min,helper(current+grid[i][j],i,j+1,grid,dp));
+		dp[i][j]=min-current;
+		return min;
 	}
 }
