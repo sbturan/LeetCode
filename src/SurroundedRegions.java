@@ -2,58 +2,41 @@
 public class SurroundedRegions {
 	public static void main(String[] args) {
 		SurroundedRegions s = new SurroundedRegions();
-		char[][] board = new char[][] { { 'O', 'O', 'O' }, { 'O', 'O', 'O' }, { 'O', 'O', 'O' } };
+		char[][] board = new char[][] { { 'X', 'O', 'X' }, { 'O', 'X', 'O' }, { 'X', 'O', 'X' } };
 		s.solve(board);
 	}
 
 	public void solve(char[][] board) {
-		if (board.length == 0)
-			return;
-		boolean[][] notCapture = new boolean[board.length][board[0].length];
-		boolean[][] visited = new boolean[board.length][board[0].length];
-		for (int i = 0; i < board[0].length; i++) {
-			travelZero(0, i, board, visited, notCapture);
+		int row=board.length;
+		int col=board[0].length;
+		for(int i=0;i<row;i++){
+			if(board[i][0]=='O')
+				helper(board,i,0);
+			if(board[i][col-1]=='O')
+				helper(board,i,col-1);
 		}
-		for (int i = 0; i < board[0].length; i++) {
-			travelZero(board.length - 1, i, board, visited, notCapture);
+		for(int i=0;i<col;i++){
+			if(board[0][i]=='O')
+				helper(board,0,i);
+			if(board[row-1][i]=='O')
+				helper(board,row-1,i);
 		}
-		for (int i = 0; i < board.length; i++) {
-			travelZero(i, board[0].length - 1, board, visited, notCapture);
-		}
-		for (int i = 0; i < board.length; i++) {
-			travelZero(i, 0, board, visited, notCapture);
-		}
-
-		for (int i = 0; i < board.length; i++) {
-			for (int j = 0; j < board[0].length; j++) {
-				if (!notCapture[i][j]) {
-					board[i][j] = 'X';
-				}
+		for(int i=0;i<row;i++){
+			for(int j=0;j<col;j++){
+				if(board[i][j]=='O')
+					board[i][j]='X';
+				else if(board[i][j]=='Z')
+					board[i][j]='O';
 			}
 		}
-
 	}
-
-	private void travelZero(int i, int j, char[][] board, boolean[][] visited, boolean[][] notCapture) {
-		// if(i<0||j<0||i>board.length-1||j>board[0].length-1) return;
-		// if(board[i][j]!='O'){
-		// visited[i][j]=true;
-		// return;
-		// }
-		// if(visited[i][j]) return;
-		
-		if (board[i][j] != 'O') {
+	int[][]dirs=new int[][]{{-1,0},{0,-1},{1,0},{0,1}};
+	private void helper(char[][] board,int x,int y){
+		if(x==-1||y==-1||x==board.length||y==board.length||board[x][y]!='O')
 			return;
+		board[x][y]='Z';
+		for(int[] dir:dirs){
+			helper(board,x+dir[0],y+dir[1]);
 		}
-		visited[i][j] = true;
-		notCapture[i][j] = true;
-		if (i + 1 < board.length-1 && !visited[i + 1][j] && board[i + 1][j] == 'O')
-			travelZero(i + 1, j, board, visited, notCapture);
-		if (i  > 1 && !visited[i - 1][j] && board[i - 1][j] == 'O')
-			travelZero(i - 1, j, board, visited, notCapture);
-		if (j + 1 < board[0].length-1 && !visited[i][j + 1] && board[i][j + 1] == 'O')
-			travelZero(i, j + 1, board, visited, notCapture);
-		if (j  > 1 && !visited[i][j - 1] && board[i][j - 1] == 'O')
-			travelZero(i, j - 1, board, visited, notCapture);
 	}
 }
