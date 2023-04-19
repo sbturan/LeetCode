@@ -1,49 +1,49 @@
-import java.util.LinkedList;
-import java.util.Queue;
-
 public class WildcardMatching {
 	public static void main(String[] args) {
-		WildcardMatching w = new WildcardMatching();
-		/*
-		 * "abefcdgiescdfimde" "ab*cd?i*de"
-		 */
-		System.out.println(w.isMatch("ab", "*?*?*"));
+		System.out.println(new WildcardMatching().isMatch("a","*?*"));
 	}
-
 	public boolean isMatch(String s, String p) {
-		int saved_p = -1, saved_s = -1;
-		int indexP = 0;
-		for (int indexS = 0; indexS < s.length();) {
 
-			if (indexP < p.length() && (s.charAt(indexS) == p.charAt(indexP) || p.charAt(indexP) == '?')) {
-				// match to a single character
-				indexP++;
-				indexS++;
-			} else if (indexP < p.length() && p.charAt(indexP) == '*') {
-				// go into the * state, we need to save the P next position and
-				// save S next position
-				// when any mismatch happen, we can revert the search to it
-				// previous state '*'
-				saved_p = indexP;
-				// move the saved_s, next time it should skip current one
-				saved_s = indexS + 1;
-				indexP++;
-			} else if (saved_p != -1) {
-				// means not match, we need to revert
-				indexP = saved_p;
-				indexS = saved_s;
-			} else {
-				// means not match, but not wildcard
-				return false;
-			}
+		String[] patterns = p.split("\\*");
+		if(patterns.length==0)
+			return true;
+		if(p.length()==0)
+			return s.length()==0;
+		boolean patternLastAsterix = p.charAt(p.length() - 1) == '*';
+		if(patterns[0]==""){
+			return isMatchWithoutStar(s.toCharArray(), patterns,0,1, patternLastAsterix);
 		}
-		// examine the left char in the pattern
-		// they should all be '*' if any char left
-		for (int index = indexP; index < p.length(); index++) {
-			if (p.charAt(index) != '*') {
+		int i=0;
+		while(i<s.length()&&i<patterns[0].length()){
+			if(patterns[0].charAt(i)!='?'&&s.charAt(i)!=patterns[0].charAt(i))
 				return false;
-			}
+			i++;
 		}
-		return true;
+		return i==patterns[0].length() && isMatchWithoutStar(s.toCharArray(), patterns,i,1,patternLastAsterix);
+	}
+	private boolean isMatchWithoutStar(char[] str,String[] patterns,int startIndex,int patternIndex,boolean patternLastAsterix){
+		if(patternIndex==patterns.length){
+			return patternLastAsterix||startIndex==str.length;
+		}
+		String pattern=patterns[patternIndex];
+		if(pattern=="")
+			return isMatchWithoutStar(str,patterns,startIndex,patternIndex+1,patternLastAsterix);
+		if(pattern.length()+startIndex>str.length)
+			return false;
+
+		int i=startIndex;
+		while(i+pattern.length()<=str.length){
+			if(pattern.charAt(0)=='?'||str[i]==pattern.charAt(0)){
+				int j=0;
+				while(j<pattern.length() && (pattern.charAt(j)=='?' ||pattern.charAt(j)==str[i+j])){
+					j++;
+				}
+				if(j==pattern.length()&&isMatchWithoutStar(str,patterns,i+j,patternIndex+1,patternLastAsterix)){
+					return true;
+				}
+			}
+			i++;
+		}
+		return false;
 	}
 }
