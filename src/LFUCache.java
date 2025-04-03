@@ -1,8 +1,8 @@
 import java.util.HashMap;
-import java.util.TreeMap;
+import java.util.PriorityQueue;
 
 public class LFUCache {
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
         LFUCache lfuCache = new LFUCache(2);
         lfuCache.put(1, 1);
         lfuCache.put(2, 2);
@@ -15,115 +15,88 @@ public class LFUCache {
         System.out.println(lfuCache.get(3));
         System.out.println(lfuCache.get(4));
     }
+    public static void main(String[] args) {
+        LFUCache lfuCache = new LFUCache(2);
+        System.out.println(lfuCache.get(2));
+        lfuCache.put(2, 6);
+        System.out.println(lfuCache.get(1));
+        lfuCache.put(1, 5);
+        lfuCache.put(1, 2);
+        System.out.println(lfuCache.get(1));
+        System.out.println(lfuCache.get(2));
+    }
 
-    class Node {
-        Node prev;
-        Node next;
-        int val;
+    class Item implements Comparable<Item>{
         int key;
-        int counter;
+        int val;
+        int freq;
+        Long recentTimeCounter;
 
-        public Node(int val) {
-            this.val = val;
-            this.counter = 1;
+        @Override
+        public int compareTo(Item a)
+        {
+            return this.recentTimeCounter.compareTo(a.recentTimeCounter);
         }
     }
 
-    HashMap<Integer, Node> map;
-    TreeMap<Integer, Node> lastNodeMap;
-    Node headDump;
     int capacity;
-
+    HashMap<Integer,Item> map;
+    PriorityQueue<Integer> freqsQueue;
+    HashMap<Integer,PriorityQueue<Item>> freqItemMap;
     public LFUCache(int capacity) {
-        map = new HashMap<>(capacity + 1);
-        lastNodeMap = new TreeMap<>();
-        this.capacity = capacity;
-        headDump = new Node(-1);
+        map=new HashMap<>();
+        this.capacity=capacity;
+        freqsQueue=new PriorityQueue<>();
+        freqItemMap=new HashMap<>();
     }
 
     public int get(int key) {
-        if (!map.containsKey(key))
+        if(!map.containsKey(key))
             return -1;
-        Node node = map.get(key);
-        node.counter++;
-        reorderList(node);
-        return node.val;
+        increateFreq(key);
+        return map.get(key).val;
     }
-
-    private void reorderList(Node node) {
-        if (node.next == null) {
-            if (node.prev == headDump || node.prev.counter != node.counter - 1) {
-                lastNodeMap.remove(node.counter - 1);
-            } else {
-                lastNodeMap.put(node.counter - 1, node.prev);
-            }
-            lastNodeMap.put(node.counter, node);
-            return;
+    private void increateFreq(int key){
+        Item item=map.get(key);
+        if(freqItemMap.containsKey(item.freq)){
+            if(freqItemMap.get(item.freq).size()==1)
+                freqsQueue.remove(item.freq);
+            freqItemMap.get(item.freq).remove(item);
         }
-        if (node.prev != null)
-            node.prev.next = node.next;
-        if (node.next != null)
-            node.next.prev = node.prev;
-        if (lastNodeMap.get(node.counter - 1) == node) {
-            if (node.prev == headDump || node.prev.counter != node.counter - 1) {
-                lastNodeMap.remove(node.counter - 1);
-            } else {
-                lastNodeMap.put(node.counter - 1, node.prev);
-            }
+        item.freq++;
+        item.recentTimeCounter=System.currentTimeMillis();
+        PriorityQueue<Item> newQueue=freqItemMap.get(item.freq);
+        if(newQueue==null){
+            newQueue=new PriorityQueue<Item>();
+            freqItemMap.put(item.freq,newQueue);
         }
-        Node cur, prev;
-        Integer key = lastNodeMap.lowerKey(node.counter + 1);
-        if (key == null) {
-            prev = headDump;
-        } else {
-            prev = lastNodeMap.get(key);
+        newQueue.add(item);
+        if(newQueue.size()==1){
+            freqsQueue.add(item.freq);
         }
-        cur = prev.next;
-        prev.next = node;
-        node.next = cur;
-        node.prev = prev;
-        if (cur != null) {
-            cur.prev = node;
-        }
-        lastNodeMap.put(node.counter, node);
     }
 
     public void put(int key, int value) {
-        if (!map.containsKey(key)) {
-            if (capacity == 0)
-                return;
-            Node head = headDump.next;
-            if (map.size() == capacity) {
-                map.remove(head.key);
-                if (lastNodeMap.get(head.counter) == head) {
-                    lastNodeMap.remove(head.counter);
-                }
-                headDump.next = head.next;
-                if (head.next != null) {
-                    head.next.prev = headDump;
-                }
-            }
-            head = headDump.next;
-            Node newNode = new Node(value);
-            newNode.key = key;
-            map.put(key, newNode);
-            Node cur = head, prev = headDump;
-            if (lastNodeMap.containsKey(1)) {
-                prev = lastNodeMap.get(1);
-                cur = prev.next;
-            }
-            newNode.prev = prev;
-            newNode.next = cur;
-            prev.next = newNode;
-            if (cur != null)
-                cur.prev = newNode;
-            lastNodeMap.put(1, newNode);
-            return;
+        if(!map.containsKey(key)&&map.size()==capacity){
+            removeLFU();
         }
-        Node node = map.get(key);
-        node.val = value;
-        node.counter++;
-        reorderList(node);
+        Item item=map.get(key);
+        if(item==null){
+            item=new Item();
+            item.freq=0;
+            item.key=key;
+            map.put(key,item);
+        }
+        item.val=value;
+        increateFreq(key);
+    }
+    private void removeLFU(){
+        int removeFreq=freqsQueue.peek();
+        Item removeItem=freqItemMap.get(removeFreq).poll();
+        map.remove(removeItem.key);
+        if(freqItemMap.get(removeFreq).size()==0){
+            freqsQueue.poll();
+        }
     }
 
 }
